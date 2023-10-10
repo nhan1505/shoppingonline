@@ -32,11 +32,11 @@ const ProductDAO = {
     ]).exec();
     var products = [];
     for (const item of items) {
-      const product = await ProductDAO.selectByID(item._id);
+      const product = await ProductDAO.selectByID(item._id); // Fixed the function name
       products.push(product);
     }
     return products;
-},
+  },
   async update(product) {
     const newvalues = { name: product.name, price: product.price, image: product.image, category: product.category };
     const result = await Models.Product.findByIdAndUpdate(product._id, newvalues, { new: true });
@@ -46,42 +46,22 @@ const ProductDAO = {
     const result = await Models.Product.findByIdAndRemove(_id);
     return result;
   },
-  async selectTopNew(top) {
-    const query = {};
-    const mysort = { cdate: -1 }; // descending
-    const products = await Models.Product.find(query).sort(mysort).limit(top).exec();
+  async selectByCatID(_cid) {
+    const query = { 'category._id': _cid };
+    const products = await Models.Product.find(query).exec();
     return products;
   },
-  async selectTopHot(top) {
-    const items = await Models.Order.aggregate([
-      { $match: { status: 'APPROVED' } },
-      { $unwind: '$items' },
-      { $group: { _id: '$items.product._id', sum: { $sum: '$items.quantity' } } },
-      { $sort: { sum: -1 } }, // descending
-      { $limit: top }
-    ]).exec();
-    var products = [];
-    for (const item of items) {
-      const product = await ProductDAO.selectByID(item._id);
-      products.push(product);
-    }
+  async selectByKeyword(keyword) {
+    const query = { name: { $regex: new RegExp(keyword, "i") } };
+    const products = await Models.Product.find(query).exec();
     return products;
-},
-async selectByCatID(_cid) {
-  const query = { 'category._id': _cid };
-  const products = await Models.Product.find(query).exec();
-  return products;
-},
-async selectByCatID(_cid) {
-  const query = { 'category._id': _cid };
-  const products = await Models.Product.find(query).exec();
-  return products;
-},
-async selectByKeyword(keyword) {
-  const query = { name: { $regex: new RegExp(keyword, "i") } };
-  const products = await Models.Product.find(query).exec();
-  return products;
-}
+  },
+  async insert(product) {
+    const mongoose = require('mongoose');
+    product._id = new mongoose.Types.ObjectId();
+    const result = await Models.Product.create(product);
+    return result;
+  },
 };
 
 module.exports = ProductDAO;
