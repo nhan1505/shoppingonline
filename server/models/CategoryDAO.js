@@ -26,11 +26,5 @@ const CategoryDAO = {
     const category = await Models.Category.findById(_id).exec();
     return category;
   },
-  async insert(product) {
-    const mongoose = require('mongoose');
-    product._id = new mongoose.Types.ObjectId();
-    const result = await Models.Product.create(product);
-    return result;
-  }
 };
 module.exports = CategoryDAO;
