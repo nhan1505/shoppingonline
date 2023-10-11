@@ -1,63 +1,94 @@
 import axios from 'axios';
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import withRouter from '../utils/withRouter';
+import MyContext from '../contexts/MyContext';
 
 
-class Product extends Component {
+class ProductDetail extends Component {
+    static contextType = MyContext;
   constructor(props) {
     super(props);
     this.state = {
-      products: []
+      product: null,
+      txtQuantity: 1
     };
   }
   render() {
-    const prods = this.state.products.map((item) => {
+    const prod = this.state.product;
+    if (prod != null) {
       return (
-        <div key={item._id} className="inline">
-          <figure>
-          <Link to={`/product/${item._id}`}><img src={`data:image/jpg;base64,${item.image}`} width="300px" height="300px" alt="" /></Link>
-            <Link to=''><img src={"data:image/jpg;base64," + item.image} width="300px" height="300px" alt="" /></Link>
-            <figcaption className="text-center">{item.name}<br />Price: {item.price}</figcaption>
+        <div className="align-center">
+          <h2 className="text-center">PRODUCT DETAILS</h2>
+          <figure className="caption-right">
+            <img src={"data:image/jpg;base64," + prod.image} width="400px" height="400px" alt="" />
+            <figcaption>
+              <form>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td align="right">ID:</td>
+                      <td>{prod._id}</td>
+                    </tr>
+                    <tr>
+                      <td align="right">Name:</td>
+                      <td>{prod.name}</td>
+                    </tr>
+                    <tr>
+                      <td align="right">Price:</td>
+                      <td>{prod.price}</td>
+                    </tr>
+                    <tr>
+                      <td align="right">Category:</td>
+                      <td>{prod.category.name}</td>
+                    </tr>
+                    <tr>
+                      <td align="right">Quantity:</td>
+                      <td><input type="number" min="1" max="99" value={this.state.txtQuantity} onChange={(e) => { this.setState({ txtQuantity: e.target.value }) }} /></td>
+                    </tr>
+                    <tr>
+                     <td></td>
+                     <td><input type="submit" value="ADD TO CART" onClick={(e) => this.btnAdd2CartClick(e)} /></td>
+                     </tr>
+                  </tbody>
+
+                </table>
+              </form>
+            </figcaption>
           </figure>
         </div>
       );
-    });
-    return (
-      <div className="text-center">
-        <h2 className="text-center">LIST PRODUCTS</h2>
-        {prods}
-      </div>
-    );
+    }
+    return (<div />);
   }
-  componentDidMount() { // first: /product/...
+  componentDidMount() {
     const params = this.props.params;
-    if (params.cid) {
-      this.apiGetProductsByCatID(params.cid);
-    } else if (params.keyword) {
-      this.apiGetProductsByKeyword(params.keyword);
+    this.apiGetProduct(params.id);
   }
-}
-  componentDidUpdate(prevProps) { // changed: /product/...
-    const params = this.props.params;
-    if (params.cid && params.cid !== prevProps.params.cid) {
-      this.apiGetProductsByCatID(params.cid);
-    } else if (params.keyword && params.keyword !== prevProps.params.keyword) {
-      this.apiGetProductsByKeyword(params.keyword);
-  }
-}
-apiGetProductsByKeyword(keyword) {
-  axios.get('/api/customer/products/search/' + keyword).then((res) => {
-    const result = res.data;
-    this.setState({ products: result });
-  });
-}
   // apis
-  apiGetProductsByCatID(cid) {
-    axios.get('/api/customer/products/category/' + cid).then((res) => {
+  apiGetProduct(id) {
+    axios.get('/api/customer/products/' + id).then((res) => {
       const result = res.data;
-      this.setState({ products: result });
+      this.setState({ product: result });
     });
   }
+    btnAdd2CartClick(e) {
+    e.preventDefault();
+    const product = this.state.product;
+    const quantity = parseInt(this.state.txtQuantity);
+    if (quantity) {
+      const mycart = this.context.mycart;
+      const index = mycart.findIndex(x => x.product._id === product._id); // check if the _id exists in mycart
+      if (index === -1) { // not found, push newItem
+        const newItem = { product: product, quantity: quantity };
+        mycart.push(newItem);
+      } else { // increasing the quantity
+        mycart[index].quantity += quantity;
+      }
+      this.context.setMycart(mycart);
+      alert('OK BABY!');
+    } else {
+      alert('Please input quantity');
+    }
+  }
 }
-export default withRouter(Product);
+export default withRouter(ProductDetail);
