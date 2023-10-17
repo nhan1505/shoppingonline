@@ -36,7 +36,7 @@ class Product extends Component {
     });
     return (
       <div>
-        <div className="float-left">
+        <div className="float-left" style="width:1000px;">
         <ProductDetail item={this.state.itemSelected} curPage={this.state.curPage} updateProducts={this.updateProducts} />
           <h2 className="text-center">PRODUCT LIST</h2>
           <table className="datatable" border="1">
