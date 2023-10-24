@@ -68,6 +68,5 @@ const ProductDAO = {
     return products;
   }
 };
-};
 
 module.exports = ProductDAO;
