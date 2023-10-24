@@ -121,9 +121,4 @@ router.get('/orders/customer/:cid', JwtUtil.checkToken, async function (req, res
   const orders = await OrderDAO.selectByCustID(_cid);
   res.json(orders);
 });
-router.get('/products/search/:keyword', async function (req, res) {
-  const keyword = req.params.keyword;
-  const products = await ProductDAO.selectByKeyword(keyword);
-  res.json(products);
-});
 module.exports = router;
