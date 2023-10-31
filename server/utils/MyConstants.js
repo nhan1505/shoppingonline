@@ -6,6 +6,6 @@ const MyConstants = {
     JWT_SECRET: 'caijcxdc',
     JWT_EXPIRES: '36000000', // in milliseconds
     EMAIL_USER: 'nhandinhthanh59@gmail.com', // gmail service
-    EMAIL_PASS: 'sysfqbmfhpxtqlus'
+    EMAIL_PASS: 'ylwxfbpncqnjmwwl'
   };
   module.exports = MyConstants;
